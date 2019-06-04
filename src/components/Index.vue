@@ -19,37 +19,43 @@
 </template>
 
 <script>
+import db from '@/firebase/init'
+
 export default {
   name: 'Index',
   data () {
     return {
-      smoothies:[
-        {
-          title: 'Mario Smoothies',
-          path: 'mario-smoothies',
-          ingredients:[
-            'banana',
-            'milk'
-          ],
-          id: '1'
-        },
-        {
-          title: 'Luigi Smoothies',
-          path: 'luigi-smoothies',
-          ingredients:[
-            'mango',
-            'lime',
-            'juice'
-          ],
-          id: '2'
-        }
-      ]
+      smoothies:[]
     }
   },
   methods:{
     deleteSmoothie(id){
-      this.smoothies = this.smoothies.filter(smoothie=>smoothie.id!=id)
+      console.log(id)
+      // Delete doc from firestore
+      db.collection('smoothies').doc(id).delete()
+      // Wanneer de delete klaar is word de smoothies uit de array verwijderd
+        .then(()=>{
+          this.smoothies = this.smoothies.filter(smoothie=>smoothie.id!=id)
+        })
     }
+  },
+  created(){
+    // fetch data from the firstore
+    db.collection('smoothies')
+      .get()
+      .then(snapshot=>{
+        snapshot.forEach(doc=>{
+          // this.smoothies.push(doc.data())
+          const obj = {
+            id : doc.id,
+            title : doc.data().title,
+            path : doc.data().path,
+            ingredients : doc.data().ingredients
+          }
+          this.smoothies.push(obj)
+          console.log(doc.data())
+        })
+      })
   }
 }
 </script>
