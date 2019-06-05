@@ -9,6 +9,7 @@
             <div v-for="(ing, index) in ingredients" :key="index">
                 <label for="ingredient">Ingredient:</label>
                 <input type="text" v-model="ingredients[index]">
+                <i class="material-icons delete" @click="deleteIng(ing)">delete</i>
             </div>
             <div class="field add-ingredient">
                 <label for="add-ingredient">Add an ingredient</label>
@@ -22,6 +23,8 @@
     </div>
 </template>
 <script>
+import db from '@/firebase/init'
+import { constants } from 'fs';
 export default {
     name: 'AddSmoothie',
     data() {
@@ -34,7 +37,22 @@ export default {
     },
     methods:{
         addSmoothie(){
-            console.log(this.title)
+            console.log(this.title.toLowerCase().split(' ').join('-'))
+            if(this.title){
+                this.feedback = null
+                db.collection('smoothies').add({
+                    title: this.title,
+                    ingredients: this.ingredients,
+                    path: this.title.toLowerCase().split(' ').join('-')
+                }).then(()=>{
+                    this.$router.push({ name: 'Index' })
+                }).catch(err=>{
+                    console.log('error')
+                })
+            }else{
+                this.feedback = "You must enter a smoothie title"
+            }
+            // console.log(this.title)
         },
         addIngredient(){
             if(this.another){    
@@ -45,6 +63,9 @@ export default {
             }else{
                 this.feedback = 'You must enter a value to add an ingredient'
             }
+        },
+        deleteIng(ing){
+            this.ingredients = this.ingredients.filter(ingredient=>ingredient!==ing)
         }
     }
 }
