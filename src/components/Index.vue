@@ -5,6 +5,7 @@
         <div class="material-icons delete" @click="deleteSmoothie(smoothie.id)">delete</div>
         <h2 class="indigo-text">
           {{smoothie.title}}
+        </h2>
           <ul class="ingredients">
             <li v-for="(ingredient, index) in smoothie.ingredients" :key="index+'A'">
               <span class="chip">
@@ -12,8 +13,12 @@
               </span>
             </li>
           </ul>
-        </h2>
       </div>
+      <span class="btn-floating btb-large halfway-fab pink">
+        <router-link :to="{name: 'EditSmoothie', params: {smoothie_path:smoothie.path}}">
+          <i class="material-icons edit">edit</i>
+        </router-link>
+      </span>
     </div>
   </div>
 </template>
@@ -45,6 +50,7 @@ export default {
       .get()
       .then(snapshot=>{
         snapshot.forEach(doc=>{
+          console.log(doc.data().path)
           // this.smoothies.push(doc.data())
           const obj = {
             id : doc.id,
